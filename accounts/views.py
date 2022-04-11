@@ -32,8 +32,7 @@ class RegisterView(APIView):
 
     def post(self, request, format=None):
         data = self.request.data
-        first_name = data['first_name']
-        last_name = data['last_name']
+        fullname = data['fullname']
         email = data['email']
         password = data['password']
         password2 = data['password2']
@@ -50,15 +49,12 @@ class RegisterView(APIView):
                                         status=status.HTTP_400_BAD_REQUEST)
                     elif email == '':
                         return Response({'error': 'Email field can not be empty'}, status=status.HTTP_400_BAD_REQUEST)
-                    elif first_name == '':
+                    elif fullname == '':
                         return Response({'error': 'first_name field can not be empty'},
-                                        status=status.HTTP_400_BAD_REQUEST)
-                    elif last_name == '':
-                        return Response({'error': 'last_name field can not be empty'},
                                         status=status.HTTP_400_BAD_REQUEST)
                     else:
                         user = User.objects.create_user(
-                            email=email, password=password, first_name=first_name, last_name=last_name)
+                            email=email, password=password, fullname=fullname)
                         # could use this to create token during registration or using signals
                         # Token.objects.create(user=user).key
                         user.save()
