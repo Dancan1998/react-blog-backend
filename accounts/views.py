@@ -81,11 +81,14 @@ class ObtainAuthToken(APIView):
         return Response(
             {'token': token.key,
              'email': user.email,
-             'first_name': user.first_name,
-             'last_name': user.last_name})
+             'fullname': user.fullname,
+             })
 
 
 class LogOut(APIView):
+    authentication_classes = (BearerAuthentication,)
+    permission_classes = (IsAuthenticated,)
+
     def get(self, request):
         request.user.auth_token.delete()
         logout(request)
