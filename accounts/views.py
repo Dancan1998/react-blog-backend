@@ -26,42 +26,52 @@ class HelloView(APIView):
         return Response({'Hello': 'View'})
 
 
-class RegisterView(APIView):
+class RegisterView(generics.GenericAPIView):
     """Register users"""
     permission_classes = [permissions.AllowAny, ]
+    serializer_class = RegisterSerializer
 
     def post(self, request, format=None):
-        data = self.request.data
-        fullname = data['fullname']
-        email = data['email']
-        password = data['password']
-        password2 = data['password2']
+        serializer = self.serializer_class(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        serializer.save()
+        # if serializer.is_valid():
+        #     serializer.is_valid(raise_exception=True)
+        #     serializer.save()
+        #     return Response(serializer.data, status=status.HTTP_201_CREATED)
+        # return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
-        serializer = RegisterSerializer(data=request.data)
-
-        if serializer.is_valid():
-            if password == password2:
-                if User.objects.filter(email=email).exists():
-                    return Response({'error': 'Email already exists'}, status=status.HTTP_400_BAD_REQUEST)
-                else:
-                    if len(password) < 6:
-                        return Response({'error': 'Password must be at least 6 characters in length'},
-                                        status=status.HTTP_400_BAD_REQUEST)
-                    elif email == '':
-                        return Response({'error': 'Email field can not be empty'}, status=status.HTTP_400_BAD_REQUEST)
-                    elif fullname == '':
-                        return Response({'error': 'first_name field can not be empty'},
-                                        status=status.HTTP_400_BAD_REQUEST)
-                    else:
-                        user = User.objects.create_user(
-                            email=email, password=password, fullname=fullname)
-                        # could use this to create token during registration or using signals
-                        # Token.objects.create(user=user).key
-                        user.save()
-                        return Response(serializer.data,
-                                        status=status.HTTP_201_CREATED)
-        else:
-            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        # data = self.request.data
+        # fullname = data['fullname']
+        # email = data['email']
+        # password = data['password']
+        # password2 = data['password2']
+        #
+        # serializer = RegisterSerializer(data=request.data)
+        #
+        # if serializer.is_valid():
+        #     if password == password2:
+        #         if User.objects.filter(email=email).exists():
+        #             return Response({'error': 'Email already exists'}, status=status.HTTP_400_BAD_REQUEST)
+        #         else:
+        #             if len(password) < 6:
+        #                 return Response({'error': 'Password must be at least 6 characters in length'},
+        #                                 status=status.HTTP_400_BAD_REQUEST)
+        #             elif email == '':
+        #                 return Response({'error': 'Email field can not be empty'}, status=status.HTTP_400_BAD_REQUEST)
+        #             elif fullname == '':
+        #                 return Response({'error': 'first_name field can not be empty'},
+        #                                 status=status.HTTP_400_BAD_REQUEST)
+        #             else:
+        #                 user = User.objects.create_user(
+        #                     email=email, password=password, fullname=fullname)
+        #                 # could use this to create token during registration or using signals
+        #                 # Token.objects.create(user=user).key
+        #                 user.save()
+        #                 return Response(serializer.data,
+        #                                 status=status.HTTP_201_CREATED)
+        # else:
+        #     return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
 class ObtainAuthToken(APIView):

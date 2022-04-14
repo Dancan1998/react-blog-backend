@@ -13,6 +13,9 @@ class RegisterSerializer(serializers.ModelSerializer):
         extra_kwargs = {"password": {"write_only": True}}
         read_only_fields = ['is_staff', 'is_active']
 
+    def create(self, validated_data):
+        return User.objects.create_user(**validated_data)
+
 
 class AuthTokenSerializer(serializers.Serializer):
     email = serializers.EmailField()
